@@ -1,139 +1,139 @@
-# Text Pseudonimisatie Tool
+# Text Pseudonymization Tool
 
-Een Python-gebaseerde command-line utility voor het anonimiseren en de-anonimiseren van tekst door identifiers te vervangen met codes. Ideaal voor het beschermen van gevoelige informatie in documenten terwijl de tekststructuur behouden blijft.
+A Python-based command-line utility for anonymizing and deanonymizing text by replacing identifiers with codes. Ideal for protecting sensitive information in documents while maintaining text structure.
 
 ## Features
 
-- 🔐 **Veilige pseudonimisatie**: Vervangt identifiers met anonieme codes (X01, X02, etc.)
-- 🔄 **Reversibele anonimisatie**: Herstel oorspronkelijke tekst met replacement files
-- 📝 **Flexibele invoer**: Ondersteuning voor zowel bestanden als interactieve tekst input
-- 🎯 **Multi-word ondersteuning**: Detecteert en vervangt ook meerwoord-identifiers
-- ⚡ **Automatische naamgeving**: Genereert output bestanden met timestamps
-- 📁 **Georganiseerde opslag**: Replacement mappings worden netjes opgeslagen
-- 🛡️ **Case-preserving**: Behoudt originele hoofdletter/kleine letter structuur
+- 🔐 **Secure pseudonymization**: Replaces identifiers with anonymous codes (X01, X02, etc.)
+- 🔄 **Reversible anonymization**: Restore original text using replacement files
+- 📝 **Flexible input**: Support for both file input and interactive text input
+- 🎯 **Multi-word support**: Detects and replaces multi-word identifiers
+- ⚡ **Automatic naming**: Generates output files with timestamps
+- 📁 **Organized storage**: Replacement mappings are neatly stored
+- 🛡️ **Case-preserving**: Maintains original capitalization structure
 
-## Installatie
+## Installation
 
 ```bash
-git clone https://github.com/jouw-username/text-pseudonymization
+git clone https://github.com/your-username/text-pseudonymization
 cd text-pseudonymization
 ```
 
-Het script vereist alleen standaard Python 3.x libraries, geen extra installaties nodig.
+The script only requires standard Python 3.x libraries, no additional installations needed.
 
 ## Quick Start
 
-### 1. Maak een identifiers bestand
+### 1. Create an identifiers file
 
-Maak een bestand `identifiers.txt` met de woorden die je wilt anonimiseren (één per regel):
+Create a file `identifiers.txt` with the words you want to anonymize (one per line):
 
 ```
 John Doe
 Jane Smith
 Amsterdam
 Confidential Project Alpha
-geheim
+secret
 ```
 
-### 2. Anonimiseer tekst
+### 2. Anonymize text
 
 ```bash
-# Van bestand
+# From file
 python pseudonymization.py document.txt
 
-# Interactieve modus
+# Interactive mode
 python pseudonymization.py
 
-# Met custom opties
+# With custom options
 python pseudonymization.py -i my_identifiers.txt -d my_replacements/ document.txt
 ```
 
-### 3. De-anonimiseer tekst
+### 3. Deanonymize text
 
 ```bash
 python pseudonymization.py -r -f replacements/replacements_document_20241226_143022.json document_anonymized.txt
 ```
 
-## Gebruik
+## Usage
 
-### Command-line Opties
+### Command-line Options
 
 ```
 usage: pseudonymization.py [-h] [-r] [-f REPLACEMENT_FILE] [-i IDENTIFIERS_FILE] 
                            [-d REPLACEMENTS_DIR] [input_file] [output_file]
 
-Opties:
-  input_file            Input tekstbestand (optioneel - vraagt om tekst als niet opgegeven)
-  output_file           Output bestand (optioneel - wordt auto-gegenereerd met timestamp)
+Options:
+  input_file            Input text file (optional - prompts for text if not provided)
+  output_file           Output file (optional - auto-generated with timestamp)
   
-  -h, --help           Toon help bericht
-  -r, --reverse        Keer anonimisatie proces om (de-anonimiseren)
-  -f, --replacement-file  Replacement bestand voor de-anonimisatie (vereist met -r)
-  -i, --identifiers-file  Bestand met identifiers (default: identifiers.txt)
-  -d, --replacements-dir  Directory voor replacement bestanden (default: replacements/)
+  -h, --help           Show help message
+  -r, --reverse        Reverse the anonymization process (deanonymize)
+  -f, --replacement-file  Replacement file for deanonymization (required with -r)
+  -i, --identifiers-file  File containing identifiers (default: identifiers.txt)
+  -d, --replacements-dir  Directory for replacement files (default: replacements/)
 ```
 
-### Voorbeelden
+### Examples
 
-#### Basis anonimisatie
+#### Basic anonymization
 ```bash
 python pseudonymization.py document.txt
 # Output: document_anonymized_20241226_143022.txt
 # Replacement: replacements/replacements_document_20241226_143022.json
 ```
 
-#### Interactieve modus
+#### Interactive mode
 ```bash
 python pseudonymization.py
-# Plak je tekst en druk Ctrl+D (Unix/Mac) of Ctrl+Z+Enter (Windows)
+# Paste your text and press Ctrl+D (Unix/Mac) or Ctrl+Z+Enter (Windows)
 ```
 
-#### Custom configuratie
+#### Custom configuration
 ```bash
 python pseudonymization.py -i custom_identifiers.txt -d my_replacements/ sensitive_data.txt output.txt
 ```
 
-#### De-anonimisatie
+#### Deanonymization
 ```bash
 python pseudonymization.py -r -f replacements/replacements_document_20241226_143022.json document_anonymized.txt
 ```
 
-## Bestandsstructuur
+## File Structure
 
 ```
 project/
-├── pseudonymization.py          # Hoofd script
-├── identifiers.txt              # Lijst van te anonimiseren woorden
-├── replacements/                # Directory voor replacement bestanden
+├── pseudonymization.py          # Main script
+├── identifiers.txt              # List of words to anonymize
+├── replacements/                # Directory for replacement files
 │   ├── replacements_document_20241226_143022.json
 │   └── replacements_report_20241226_144500.json
-├── document.txt                 # Origineel document
+├── document.txt                 # Original document
 ├── document_anonymized_20241226_143022.txt
 └── document_deanonymized_20241226_145000.txt
 ```
 
-## Hoe het werkt
+## How It Works
 
-### Anonimisatie Proces
+### Anonymization Process
 
-1. **Identifier Detectie**: Het script zoekt naar woorden en zinnen uit de identifiers lijst
-2. **Prioritering**: Langere zinnen hebben voorrang over kortere woorden
-3. **Code Generatie**: Elke unieke identifier krijgt een code (X01, X02, etc.)
-4. **Replacement**: Alle voorkomens worden vervangen met codes
-5. **Mapping Opslag**: Relatie wordt opgeslagen in JSON bestand
+1. **Identifier Detection**: The script searches for words and phrases from the identifiers list
+2. **Prioritization**: Longer phrases take precedence over shorter words
+3. **Code Generation**: Each unique identifier gets a code (X01, X02, etc.)
+4. **Replacement**: All occurrences are replaced with codes
+5. **Mapping Storage**: Relationships are stored in JSON file
 
-### Voorbeeld Transformatie
+### Example Transformation
 
-**Voor anonimisatie:**
+**Before anonymization:**
 ```
-John Doe werkte aan Confidential Project Alpha in Amsterdam.
-Jane Smith coordineerde het project vanuit het hoofdkantoor.
+John Doe worked on Confidential Project Alpha in Amsterdam.
+Jane Smith coordinated the project from headquarters.
 ```
 
-**Na anonimisatie:**
+**After anonymization:**
 ```
-X01 werkte aan X02 in X03.
-X04 coordineerde het project vanuit het hoofdkantoor.
+X01 worked on X02 in X03.
+X04 coordinated the project from headquarters.
 ```
 
 **Replacement mapping:**
@@ -144,49 +144,31 @@ X04 coordineerde het project vanuit het hoofdkantoor.
     "Confidential Project Alpha": "X02",
     "Amsterdam": "X03",
     "Jane Smith": "X04"
-    }
-}
-```
-
-And the `replacements.json` would look like:
-```json
-{
-  "word_to_code": {
-    "John": "X01",
-    "JOHN": "X03",
-    "john": "X04",
-    "Tech": "X02"
-  },
-  "code_to_word": {
-    "X01": "John",
-    "X03": "JOHN", 
-    "X04": "john",
-    "X02": "Tech"
   }
 }
 ```
 
-## Geavanceerde Features
+## Advanced Features
 
 ### Multi-word Identifiers
-Het script detecteert automatisch meerwoord-identifiers en geeft deze voorrang:
+The script automatically detects multi-word identifiers and prioritizes them:
 ```
 identifiers.txt:
 New York
 York
 
-Tekst: "I visited New York last year"
-Result: "I visited X01 last year" (niet "I visited New X02 last year")
+Text: "I visited New York last year"
+Result: "I visited X01 last year" (not "I visited New X02 last year")
 ```
 
 ### Case Preservation
-Originele hoofdlettergebruik wordt behouden:
+Original capitalization is maintained:
 ```
 "JOHN DOE and john doe" → "X01 and X01"
 ```
 
 ### Timestamp Matching
-Output bestanden en replacement bestanden gebruiken dezelfde timestamp voor eenvoudige koppeling:
+Output files and replacement files use the same timestamp for easy pairing:
 ```
 document_anonymized_20241226_143022.txt
 replacements_document_20241226_143022.json
@@ -194,86 +176,87 @@ replacements_document_20241226_143022.json
 
 ## Best Practices
 
-### Identifiers Bestand
-- Plaats meest specifieke/langste identifiers eerst
-- Gebruik # voor commentaar regels
-- Test met voorbeeldtekst voordat je grote bestanden verwerkt
+### Identifiers File
+- Place most specific/longest identifiers first
+- Use # for comment lines
+- Test with sample text before processing large files
 
 ```
-# Namen
+# Names
 John Doe
 Jane Smith
 
-# Plaatsen  
+# Places  
 New York City
 Amsterdam
 
-# Projecten
+# Projects
 Confidential Project Alpha
 Project Beta
 ```
 
-### Beveiliging
-- Bewaar replacement bestanden veilig - deze bevatten de originele identifiers
-- Gebruik verschillende replacement directories voor verschillende projecten
-- Backup replacement bestanden voordat je ze deelt of verplaatst
+### Security
+- Store replacement files securely - they contain the original identifiers
+- Use different replacement directories for different projects
+- Backup replacement files before sharing or moving them
 
 ### Workflow
-1. Test eerst met kleine tekstvoorbeelden
-2. Controleer de anonieme output op completheid
-3. Bewaar replacement bestanden op veilige locatie
-4. Documenteer welke replacement bij welke output hoort
+1. Test first with small text samples
+2. Check the anonymized output for completeness
+3. Store replacement files in a secure location
+4. Document which replacement belongs to which output
 
 ## Troubleshooting
 
-### Veelvoorkomende Problemen
+### Common Issues
 
 **"No identifiers found"**
-- Controleer of `identifiers.txt` bestaat en identifiers bevat
-- Zorg dat identifiers exact overeenkomen met tekst in document
+- Check if `identifiers.txt` exists and contains identifiers
+- Ensure identifiers match exactly with text in document
 
 **"Replacement file not found"**
-- Controleer pad naar replacement bestand
-- Zorg dat je het juiste replacement bestand gebruikt voor de tekst
+- Check path to replacement file
+- Make sure you're using the correct replacement file for the text
 
-**Onvolledig geanonimiseerd**
-- Controleer of alle varianten van namen in identifiers staan
-- Let op hoofdlettergebruik en spelling variaties
+**Incomplete anonymization**
+- Check if all variants of names are in identifiers
+- Pay attention to capitalization and spelling variations
 
 ### Debug Tips
 ```bash
-# Test met verbose output
+# Test with verbose output
 python pseudonymization.py -i identifiers.txt test_small.txt
 
-# Controleer wat er gevonden wordt in de output
-# Script toont altijd welke identifiers het vindt
+# Check what's found in the output
+# Script always shows which identifiers it finds
 ```
 
 ## Contributing
 
-Bijdragen zijn welkom! Open een issue of submit een pull request.
+Contributions are welcome! Open an issue or submit a pull request.
 
 ### Development Setup
 ```bash
-git clone https://github.com/jouw-username/text-pseudonymization
+git clone https://github.com/your-username/text-pseudonymization
 cd text-pseudonymization
-# Geen extra dependencies nodig
+# No extra dependencies needed
 ```
 
 ## License
 
-Dit project is gelicenseerd onder de MIT License - zie het [LICENSE](LICENSE) bestand voor details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Changelog
 
 ### v1.0.0
-- Basis pseudonimisatie functionaliteit
-- Multi-word identifier ondersteuning
-- Interactieve tekst input
-- Automatische bestandsnaam generatie
-- Korte command-line opties
+- Basic pseudonymization functionality
+- Multi-word identifier support
+- Interactive text input
+- Automatic filename generation
+- Short command-line options
 
 ---
 
-**⚠️ Belangrijk**: 
-Dit tool is bedoeld voor basis tekstpseudonymisatie. Voor medische, juridische of andere gevoelige data, controleer altijd de output en volg relevante privacy regelgeving.
+**⚠️ Important**: 
+
+This tool is designed for basic text pseudonymization. For medical, legal, or other sensitive data, always verify the output and follow relevant privacy regulations.

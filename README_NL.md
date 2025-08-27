@@ -7,6 +7,7 @@ Een Python-gebaseerde command-line utility voor het anonimiseren en de-anonimise
 - 🔐 **Veilige pseudonimisatie**: Vervangt identifiers met anonieme codes (X01, X02, etc.)
 - 🔄 **Reversibele anonimisatie**: Herstel oorspronkelijke tekst met replacement files
 - 📝 **Flexibele invoer**: Ondersteuning voor zowel bestanden als interactieve tekst input
+- 🎯 **Automatische detectie e-mail adressen**: Herkent e-mail adressen zonder dat ze opgevoerd hoeven te worden in de lijst
 - 🎯 **Multi-word ondersteuning**: Detecteert en vervangt ook meerwoord-identifiers
 - ⚡ **Automatische naamgeving**: Genereert output bestanden met timestamps
 - 📁 **Georganiseerde opslag**: Replacement mappings worden netjes opgeslagen
@@ -59,18 +60,24 @@ python pseudonymization.py -r -f replacements/replacements_document_20241226_143
 ### Command-line Opties
 
 ```
-usage: pseudonymization.py [-h] [-r] [-f REPLACEMENT_FILE] [-i IDENTIFIERS_FILE] 
-                           [-d REPLACEMENTS_DIR] [input_file] [output_file]
+usage: pseudonymization.py [-h] [-r] [-f REPLACEMENT_FILE] [-i IDENTIFIERS_FILE] [-d REPLACEMENTS_DIR] [--no-email] [input_file] [output_file]
 
-Opties:
-  input_file            Input tekstbestand (optioneel - vraagt om tekst als niet opgegeven)
-  output_file           Output bestand (optioneel - wordt auto-gegenereerd met timestamp)
-  
-  -h, --help           Toon help bericht
-  -r, --reverse        Keer anonimisatie proces om (de-anonimiseren)
-  -f, --replacement-file  Replacement bestand voor de-anonimisatie (vereist met -r)
-  -i, --identifiers-file  Bestand met identifiers (default: identifiers.txt)
-  -d, --replacements-dir  Directory voor replacement bestanden (default: replacements/)
+Text Pseudonymization Utility - Anonymize and deanonymize text by replacing identifiers with codes
+
+positional arguments:
+  input_file            Input text file to process (optional - will prompt for text input if not provided)
+  output_file           Output file for processed text (optional - will be auto-generated with timestamp if not provided)
+
+options:
+  -h, --help            show this help message and exit
+  -r, --reverse         Reverse the anonymization process (deanonymize)
+  -f REPLACEMENT_FILE, --replacement-file REPLACEMENT_FILE
+                        Specific replacement file to use for deanonymization (required with --reverse)
+  -i IDENTIFIERS_FILE, --identifiers-file IDENTIFIERS_FILE
+                        File containing identifiers to anonymize, one per line (default: identifiers.txt)
+  -d REPLACEMENTS_DIR, --replacements-dir REPLACEMENTS_DIR
+                        Directory for storing replacement mapping files (default: replacements/)
+  --no-email            Disable automatic email detection and anonymization
 ```
 
 ### Voorbeelden

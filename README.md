@@ -7,6 +7,7 @@ A Python-based command-line utility for anonymizing and deanonymizing text by re
 - 🔐 **Secure pseudonymization**: Replaces identifiers with anonymous codes (X01, X02, etc.)
 - 🔄 **Reversible anonymization**: Restore original text using replacement files
 - 📝 **Flexible input**: Support for both file input and interactive text input
+- 🎯 **Auto detect e-mail addresses**: Genericly detects and replaces e-mail addresses
 - 🎯 **Multi-word support**: Detects and replaces multi-word identifiers
 - ⚡ **Automatic naming**: Generates output files with timestamps
 - 📁 **Organized storage**: Replacement mappings are neatly stored
@@ -59,18 +60,24 @@ python pseudonymization.py -r -f replacements/replacements_document_20241226_143
 ### Command-line Options
 
 ```
-usage: pseudonymization.py [-h] [-r] [-f REPLACEMENT_FILE] [-i IDENTIFIERS_FILE] 
-                           [-d REPLACEMENTS_DIR] [input_file] [output_file]
+usage: pseudonymization.py [-h] [-r] [-f REPLACEMENT_FILE] [-i IDENTIFIERS_FILE] [-d REPLACEMENTS_DIR] [--no-email] [input_file] [output_file]
 
-Options:
-  input_file            Input text file (optional - prompts for text if not provided)
-  output_file           Output file (optional - auto-generated with timestamp)
-  
-  -h, --help           Show help message
-  -r, --reverse        Reverse the anonymization process (deanonymize)
-  -f, --replacement-file  Replacement file for deanonymization (required with -r)
-  -i, --identifiers-file  File containing identifiers (default: identifiers.txt)
-  -d, --replacements-dir  Directory for replacement files (default: replacements/)
+Text Pseudonymization Utility - Anonymize and deanonymize text by replacing identifiers with codes
+
+positional arguments:
+  input_file            Input text file to process (optional - will prompt for text input if not provided)
+  output_file           Output file for processed text (optional - will be auto-generated with timestamp if not provided)
+
+options:
+  -h, --help            show this help message and exit
+  -r, --reverse         Reverse the anonymization process (deanonymize)
+  -f REPLACEMENT_FILE, --replacement-file REPLACEMENT_FILE
+                        Specific replacement file to use for deanonymization (required with --reverse)
+  -i IDENTIFIERS_FILE, --identifiers-file IDENTIFIERS_FILE
+                        File containing identifiers to anonymize, one per line (default: identifiers.txt)
+  -d REPLACEMENTS_DIR, --replacements-dir REPLACEMENTS_DIR
+                        Directory for storing replacement mapping files (default: replacements/)
+  --no-email            Disable automatic email detection and anonymization
 ```
 
 ### Examples

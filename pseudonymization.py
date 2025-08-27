@@ -48,6 +48,54 @@ class TextAnonymizer:
             print(f"Error loading identifiers file: {e}")
             sys.exit(1)
     
+    def _find_email_addresses(self, text):
+        """
+        Find email addresses in the text using comprehensive pattern.
+        
+        :param text: Input text
+        :return: List of email addresses found
+        """
+        # Comprehensive email regex pattern
+        email_pattern = r'''
+            \b                                          # Word boundary
+            [a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+           # Local part - allowed characters
+            @                                           # @ symbol
+            [a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?   # Domain name part
+            (?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)* # Subdomains
+            \.[a-zA-Z]{2,}                             # Top-level domain (2+ chars)
+            \b                                          # Word boundary
+        '''
+        
+        # Find all email matches using verbose regex
+        emails = re.findall(email_pattern, text, re.VERBOSE)
+        
+        # Also try a simpler pattern as backup to catch any missed emails
+        simple_email_pattern = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b'
+        simple_emails = re.findall(simple_email_pattern, text)
+        
+        # Combine both results and remove duplicates
+        all_emails = list(set(emails + simple_emails))
+        
+        return all_emails
+    
+    def _detect_emails_and_add_to_identifiers(self, text):
+        """
+        Detect email addresses in text and add them to the identifiers set.
+        
+        :param text: Input text
+        :return: List of detected emails
+        """
+        emails = self._find_email_addresses(text)
+        
+        if emails:
+            print(f"Auto-detected {len(emails)} email addresses:")
+            for email in sorted(emails):
+                print(f"  - {email}")
+                self.identifiers.add(email.lower())
+            print("Added emails to identifiers for anonymization.")
+        
+        return emails
+    
     def _generate_replacement_filename(self, input_filename):
         """
         Generate a unique replacement filename with timestamp.
@@ -161,14 +209,21 @@ class TextAnonymizer:
         # Sort matches by position to process them in order
         return sorted(matches, key=lambda x: x[0])
     
-    def anonymize(self, text, input_filename="unknown"):
+    def anonymize(self, text, input_filename="unknown", detect_emails=True):
         """
         Anonymize the given text by replacing identified words and phrases while preserving case.
+        Optionally auto-detect email addresses.
         
         :param text: Input text to anonymize
         :param input_filename: Name of the input file (for replacement filename generation)
+        :param detect_emails: Whether to automatically detect and anonymize emails
         :return: Tuple of (anonymized_text, replacement_file_path)
         """
+        # Auto-detect emails if requested
+        detected_emails = []
+        if detect_emails:
+            detected_emails = self._detect_emails_and_add_to_identifiers(text)
+        
         if not self.identifiers:
             print("No identifiers loaded. Text will not be anonymized.")
             return text, None
@@ -201,6 +256,13 @@ class TextAnonymizer:
             if self._should_anonymize_word(word):
                 items_to_anonymize.add(word)
         
+        # Also check for email addresses directly (in case word boundaries missed some)
+        if detect_emails:
+            for email in detected_emails:
+                # Find all occurrences of this email in the text
+                for match in re.finditer(re.escape(email), text, re.IGNORECASE):
+                    items_to_anonymize.add(match.group())
+        
         if not items_to_anonymize:
             print("No identifiers found in text. No anonymization needed.")
             return text, None
@@ -230,9 +292,9 @@ class TextAnonymizer:
                 self.word_to_code[item] = code
             
             # Replace all occurrences of this item with its code
-            # For multi-word phrases, we need word boundaries at start and end
-            if ' ' in item:
-                # Multi-word phrase - use word boundary at start and end only
+            # For multi-word phrases and emails, we need word boundaries at start and end
+            if ' ' in item or '@' in item:
+                # Multi-word phrase or email - use word boundary at start and end only
                 pattern = r'\b' + re.escape(item) + r'\b'
             else:
                 # Single word
@@ -249,7 +311,9 @@ class TextAnonymizer:
                 'created': datetime.now().isoformat(),
                 'input_file': input_filename,
                 'identifiers_file': self.identifiers_file,
-                'total_replacements': len(self.word_to_code)
+                'total_replacements': len(self.word_to_code),
+                'emails_detected': len(detected_emails) if detect_emails else 0,
+                'detected_emails': detected_emails if detect_emails else []
             },
             'word_to_code': self.word_to_code,
             'code_to_word': self.code_to_word
@@ -284,6 +348,11 @@ class TextAnonymizer:
                 print("No replacement mappings found in file.")
                 return text
             
+            # Show some metadata if available
+            metadata = replacement_data.get('metadata', {})
+            if 'emails_detected' in metadata:
+                print(f"This replacement file contained {metadata['emails_detected']} auto-detected emails.")
+            
             # Restore each code to its original word
             deanonymized_text = text
             for code, word in code_to_word.items():
@@ -302,17 +371,19 @@ class TextAnonymizer:
 def main():
     # Set up argument parser
     parser = argparse.ArgumentParser(
-        description='Text Pseudonimisatie Utility - Anonymize and deanonymize text by replacing identifiers with codes',
+        description='Text Pseudonymization Utility - Anonymize and deanonymize text by replacing identifiers with codes',
         epilog="""
 Examples:
-  %(prog)s document.txt                           # Anonymize document.txt
+  %(prog)s document.txt                           # Anonymize document.txt (auto-detect emails)
   %(prog)s document.txt output.txt                # Anonymize with specific output file
+  %(prog)s --no-email document.txt                # Anonymize without email detection
   %(prog)s                                        # Interactive mode - paste text to anonymize
   %(prog)s -r -f replacements/file.json input.txt # Deanonymize using replacement file
   %(prog)s -i custom_ids.txt -d my_replacements/  # Use custom identifiers and directory
 
-The program replaces identifiers (names, places, etc.) with anonymous codes (X01, X02, ...)
-while maintaining text structure. Replacement mappings are saved for later deanonymization.
+The program replaces identifiers (names, places, emails, etc.) with anonymous codes (X01, X02, ...)
+while maintaining text structure. Email addresses are automatically detected and anonymized.
+Replacement mappings are saved for later deanonymization.
         """,
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
@@ -331,6 +402,8 @@ while maintaining text structure. Replacement mappings are saved for later deano
                         help='File containing identifiers to anonymize, one per line (default: identifiers.txt)')
     parser.add_argument('-d', '--replacements-dir', default='replacements',
                         help='Directory for storing replacement mapping files (default: replacements/)')
+    parser.add_argument('--no-email', action='store_true',
+                        help='Disable automatic email detection and anonymization')
     
     # Parse arguments
     args = parser.parse_args()
@@ -401,8 +474,9 @@ while maintaining text structure. Replacement mappings are saved for later deano
         processed_text = anonymizer.deanonymize(text, args.replacement_file)
         operation = "Deanonymized"
     else:
-        # Anonymize
-        processed_text, replacement_file = anonymizer.anonymize(text, input_filename)
+        # Anonymize (with or without email detection)
+        detect_emails = not args.no_email
+        processed_text, replacement_file = anonymizer.anonymize(text, input_filename, detect_emails)
         operation = "Anonymized"
     
     # Write output file
